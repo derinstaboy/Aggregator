@@ -82,15 +82,20 @@
   background-color: #f2f2f2; /* Background color on hover */
 }
 
-/* Responsive Navbar styles */
 @media (max-width: 768px) {
     .nav-wrapper {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
     }
 
     .nav-links {
-        display: none;
+        display: none; /* Hide the desktop links in mobile view */
+    }
+
+    .dropdown-menu.open {
+        display: block;
     }
 
     .dropdown-menu {
@@ -103,10 +108,6 @@
         padding: 10px 0;
         border-radius: 0 0 10px 10px;
         transition: all 0.3s ease-in-out;
-    }
-
-    .dropdown-menu.open {
-        display: block;
     }
 
     .dropdown-menu a {
