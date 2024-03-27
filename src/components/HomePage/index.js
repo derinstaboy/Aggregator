@@ -55,7 +55,7 @@ export default function HomePage(props) {
     position: { x: "right", y: "top" },
     dismissible: true,
   });
-  const [slippage1, setSlippage1] = useState(95);
+  const [slippage1, setSlippage1] = useState(1);
   const [deadline, setDeadline] = useState(20);
   const [expanded, setExpanded] = useState(false);
   const { data: signer, isError, isLoading } = useSigner();
@@ -339,6 +339,14 @@ export default function HomePage(props) {
     setSelectedIcon2(temp2);
     setUserInput(0);
   }
+
+function calculateAmountAfterSlippage() {
+  const slippageFraction = parseFloat(slippage1) / 100;
+  const amountAfterSlippage = outPutTokens * (1 - slippageFraction);
+  return amountAfterSlippage.toFixed(1); // Adjust decimal points as needed
+}
+
+
   function onChangeInput(event) {
     setDeadline(event.target.value);
   }
@@ -682,6 +690,11 @@ export default function HomePage(props) {
                   </div>
                 </div>
               </div>
+                          <
+
+div className="slippage-display">
+  <span className="small-text">Current slippage: {slippage1}%</span>
+</div>
               <div className="token-input">
                 <div className="swap-mode-selector">
                   <div
@@ -824,6 +837,11 @@ export default function HomePage(props) {
                   </div>
               </div>
               </div>
+                    <div className="token-input-row">
+  <div className="amount-after-slippage">
+    <span className="small-text">Minimum received: {calculateAmountAfterSlippage()}</span>
+  </div>
+</div>
               <div className="btn-wrapper">
                 {!signer && (
                   <ConnectButton
