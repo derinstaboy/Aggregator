@@ -1,10 +1,13 @@
-import React from "react";
-import Logo from "../assests/images/logo.svg";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-
-import "./style.css";
+import React, { useState } from 'react';
+import Logo from '../assests/images/logo.svg';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import './style.css';
 
 export default function Navbar(props) {
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
+
   return (
     <>
       <header className="primary-header">
@@ -14,11 +17,25 @@ export default function Navbar(props) {
               <img src={Logo} alt="" />
               <p>CroKing</p>
             </div>
-    <div className="nav-links">
-              <a href="https://app.croking.net/staking/boosted" className="nav-button">Staking</a>
-              <a href="https://app.croking.net/marketplace" className="nav-button">NFT Marketplace</a>
+
+            {/* Hamburger Icon for mobile */}
+            <div className="hamburger" onClick={toggleDropdown}>
+              {/* Icon bars */}
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
-            <ConnectButton sx={{ color: "#020202" }} />
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="dropdown-menu">
+                <a href="https://app.croking.net/staking/boosted">Staking</a>
+                <a href="https://app.croking.net/marketplace">NFT Marketplace</a>
+                {/* Add other links as needed */}
+              </div>
+            )}
+
+            <ConnectButton sx={{ color: '#020202' }} />
           </div>
         </div>
       </header>
