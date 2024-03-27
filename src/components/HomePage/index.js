@@ -685,12 +685,6 @@ function calculateAmountAfterSlippage() {
                       />
                     )}
                   </div>
-
-<div className="token-input-row">
-  <div className="amount-after-slippage">
-    Amount after slippage: {calculateAmountAfterSlippage()}
-  </div>
-</div>
                   <div className="token-input-row">
                     <div className="coin-name">{selectedToken2}</div>
                   </div>
@@ -718,6 +712,11 @@ function calculateAmountAfterSlippage() {
                       </p>
                     )}
                   </div>
+                    <div className="token-input-row">
+  <div className="amount-after-slippage">
+    Amount after slippage: {calculateAmountAfterSlippage()}
+  </div>
+</div>
                   <div
                     style={{
                       display: expanded ? "flex" : "none",
