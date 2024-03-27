@@ -18,20 +18,24 @@ export default function Navbar(props) {
               <p>CroKing</p>
             </div>
 
+            {/* Standard navigation buttons for desktop */}
+            <div className="nav-links">
+              <a href="https://app.croking.net/staking/boosted" className="nav-button">Staking</a>
+              <a href="https://app.croking.net/marketplace" className="nav-button">NFT Marketplace</a>
+            </div>
+
             {/* Hamburger Icon for mobile */}
             <div className="hamburger" onClick={toggleDropdown}>
-              {/* Icon bars */}
               <span></span>
               <span></span>
               <span></span>
             </div>
 
-            {/* Dropdown Menu */}
+            {/* Dropdown Menu for mobile */}
             {isDropdownOpen && (
               <div className="dropdown-menu">
                 <a href="https://app.croking.net/staking/boosted">Staking</a>
                 <a href="https://app.croking.net/marketplace">NFT Marketplace</a>
-                {/* Add other links as needed */}
               </div>
             )}
 
