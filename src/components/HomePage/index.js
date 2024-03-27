@@ -339,6 +339,14 @@ export default function HomePage(props) {
     setSelectedIcon2(temp2);
     setUserInput(0);
   }
+
+function calculateAmountAfterSlippage() {
+  const slippageFraction = parseFloat(slippage1) / 100;
+  const amountAfterSlippage = outPutTokens * (1 - slippageFraction);
+  return amountAfterSlippage.toFixed(4); // Adjust decimal points as needed
+}
+
+
   function onChangeInput(event) {
     setDeadline(event.target.value);
   }
@@ -677,6 +685,12 @@ export default function HomePage(props) {
                       />
                     )}
                   </div>
+
+<div className="token-input-row">
+  <div className="amount-after-slippage">
+    Amount after slippage: {calculateAmountAfterSlippage()}
+  </div>
+</div>
                   <div className="token-input-row">
                     <div className="coin-name">{selectedToken2}</div>
                   </div>
