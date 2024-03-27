@@ -14,6 +14,10 @@ export default function Navbar(props) {
               <img src={Logo} alt="" />
               <p>CroKing</p>
             </div>
+    <div className="nav-links">
+              <a href="https://app.croking.net/staking/boosted" className="nav-button">Staking</a>
+              <a href="https://app.croking.net/marketplace" className="nav-button">NFT Marketplace</a>
+            </div>
             <ConnectButton sx={{ color: "#020202" }} />
           </div>
         </div>
