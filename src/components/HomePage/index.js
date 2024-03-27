@@ -837,6 +837,11 @@ div className="slippage-display">
                   </div>
               </div>
               </div>
+                    <div className="token-input-row">
+  <div className="amount-after-slippage">
+    Minimum received: {calculateAmountAfterSlippage()}
+  </div>
+</div>
               <div className="btn-wrapper">
                 {!signer && (
                   <ConnectButton
@@ -857,11 +862,6 @@ div className="slippage-display">
                 )}
               </div>
             </div>
-<div className="token-input-row">
-  <div className="amount-after-slippage">
-    Minimum received: {calculateAmountAfterSlippage()}
-  </div>
-</div>
           ) : (
             <div className="card2">
               <div className="select-token-header">
