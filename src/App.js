@@ -46,7 +46,7 @@ const wagmiClient = createClient({
 export default function App() {
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [tokens, setTokens] = useState({
-    token1: isCRO,
+    token1: "CRO",
     token2: "0x7C8b5501A40D382e8A11889834c80b2D7Fa1Fc4F",
   });
   const [userInput, setUserInput] = useState("0");
