@@ -343,7 +343,7 @@ export default function HomePage(props) {
 function calculateAmountAfterSlippage() {
   const slippageFraction = parseFloat(slippage1) / 100;
   const amountAfterSlippage = outPutTokens * (1 - slippageFraction);
-  return amountAfterSlippage.toFixed(4); // Adjust decimal points as needed
+  return amountAfterSlippage.toFixed(1); // Adjust decimal points as needed
 }
 
 
@@ -690,8 +690,8 @@ function calculateAmountAfterSlippage() {
                   </div>
                 </div>
               </div>
-                          <div className="current-slippage-info">
-  Current Slippage: {slippage1}%
+                          <div className="slippage-display">
+  Current slippage: <span className="small-text">{slippage1}%</span>
 </div>
               <div className="token-input">
                 <div className="swap-mode-selector">
