@@ -31,12 +31,10 @@ export default function Navbar(props) {
           </div>
 
           {/* Dropdown Menu for mobile */}
-          {isDropdownOpen && (
-            <div className="dropdown-menu">
-              <a href="https://app.croking.net/staking/boosted">Staking</a>
-              <a href="https://app.croking.net/marketplace">NFT Marketplace</a>
-            </div>
-          )}
+          <div className={`dropdown-menu ${isDropdownOpen ? 'open' : ''}`}>
+            <a href="https://app.croking.net/staking/boosted">Staking</a>
+            <a href="https://app.croking.net/marketplace">NFT Marketplace</a>
+          </div>
 
           <ConnectButton sx={{ color: '#020202' }} />
         </div>
