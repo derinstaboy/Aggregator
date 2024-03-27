@@ -41,6 +41,23 @@
   .nav-list :focus {
     color: white;
   }
+
+
+.nav-links {
+  display: flex; /* Aligns the links in a row */
+  align-items: center; /* Center items vertically */
+  gap: 15px; /* Add space between links */
+}
+
+.nav-button {
+  padding: 8px 16px;
+  background-color: #4CAF50; /* Example color */
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  /* More styling as needed */
+}
+
   .logo{
     display: flex;
     align-items: center;
