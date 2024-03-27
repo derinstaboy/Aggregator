@@ -87,49 +87,32 @@
   display: none;
 }
 
-/* Hamburger Icon Style */
+/* Styles for the mobile hamburger icon */
 .hamburger {
-  display: none; /* Hidden by default, shown only on mobile */
-  cursor: pointer;
-  /* Add more styling as needed */
+  display: none;
 }
 
-.hamburger span {
-  display: block;
-  width: 25px;
-  height: 3px;
-  margin: 5px auto;
-  background-color: #333;
-  transition: all 0.3s ease-in-out;
-}
-
-/* Dropdown Menu Style */
+/* Styles for the mobile dropdown menu */
 .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background-color: #f9f9f9;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
+  display: none;
+  /* Other styles for dropdown */
 }
 
-.dropdown-menu a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  text-align: left;
-}
-
-/* Media Query for Mobile Devices */
+/* Media query for mobile screens */
 @media screen and (max-width: 768px) {
+  /* Hide desktop navigation links on mobile */
+  .nav-links {
+    display: none;
+  }
+
+  /* Show hamburger icon on mobile */
   .hamburger {
     display: block;
   }
 
-  .nav-links, .nav-button {
-    display: none; /* Hide desktop menu buttons on mobile */
+  /* Show dropdown menu when it's open */
+  .dropdown-menu {
+    display: block;
   }
 }
 
