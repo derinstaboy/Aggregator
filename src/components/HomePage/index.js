@@ -717,11 +717,6 @@ div className="slippage-display">
                       </p>
                     )}
                   </div>
-                    <div className="token-input-row">
-  <div className="amount-after-slippage">
-    Minimum received: {calculateAmountAfterSlippage()}
-  </div>
-</div>
                   <div
                     style={{
                       display: expanded ? "flex" : "none",
@@ -993,6 +988,11 @@ div className="slippage-display">
                         </div>
                     </div> */}
             </div>
+            <div className="token-input-row">
+  <div className="amount-after-slippage">
+    Minimum received: {calculateAmountAfterSlippage()}
+  </div>
+</div>
           )}
           <div className="img-wrapper">
             <img className="lionImage" src={lionImage} alt="lionImage" />
