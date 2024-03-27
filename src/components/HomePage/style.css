@@ -687,6 +687,30 @@ button:focus {
     border-radius: 20px;
 }
 
+/* Responsive design adjustments for slippage settings */
+@media (max-width: 800px) {
+    .setting-wrapper {
+        padding: 2rem; /* Adjust padding for smaller screens */
+        width: 90%; /* Adjust width to fit mobile screens */
+    }
+
+    .slippage-item {
+        font-size: 14px; /* Smaller font size for mobile */
+        padding: 0.25rem 0.5rem; /* Adjust padding for slippage items */
+    }
+
+    .setting-component input {
+        max-width: 60px; /* Adjust the width of the input box */
+        font-size: 16px; /* Increase font size for better readability */
+    }
+
+    /* Adjust the layout of the slippage list to stack vertically */
+    .slippage {
+        flex-direction: column;
+        gap: 10px; /* Add space between items */
+    }
+}
+
 @media (max-width: 800px) {
     .slippage{
         gap: 1rem;
