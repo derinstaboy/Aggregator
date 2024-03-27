@@ -55,7 +55,7 @@ export default function HomePage(props) {
     position: { x: "right", y: "top" },
     dismissible: true,
   });
-  const [slippage1, setSlippage1] = useState(95);
+  const [slippage1, setSlippage1] = useState(1);
   const [deadline, setDeadline] = useState(20);
   const [expanded, setExpanded] = useState(false);
   const { data: signer, isError, isLoading } = useSigner();
@@ -714,7 +714,7 @@ function calculateAmountAfterSlippage() {
                   </div>
                     <div className="token-input-row">
   <div className="amount-after-slippage">
-    Amount after slippage: {calculateAmountAfterSlippage()}
+    Minimum received: {calculateAmountAfterSlippage()}
   </div>
 </div>
                   <div
