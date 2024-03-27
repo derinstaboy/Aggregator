@@ -839,7 +839,7 @@ div className="slippage-display">
               </div>
                     <div className="token-input-row">
   <div className="amount-after-slippage">
-    Minimum received: {calculateAmountAfterSlippage()}
+    <span className="small-text">Minimum received: {calculateAmountAfterSlippage()}</span>
   </div>
 </div>
               <div className="btn-wrapper">
