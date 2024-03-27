@@ -690,6 +690,9 @@ function calculateAmountAfterSlippage() {
                   </div>
                 </div>
               </div>
+                          <div className="current-slippage-info">
+  Current Slippage: {slippage1}%
+</div>
               <div className="token-input">
                 <div className="swap-mode-selector">
                   <div
