@@ -66,7 +66,7 @@ export default function HomePage(props) {
   const [selectToken2, setSelectToken2] = useState(false);
   const [searchValue1, setSearchValue1] = useState("");
   const [searchValue2, setSearchValue2] = useState("");
-  const [selectedToken1, setSelectedToken1] = useState("CRO");
+  const [selectedToken1, setSelectedToken1] = useState("WCRO");
   const [selectedToken2, setSelectedToken2] = useState("CRK");
   const [isSetting, setIsSetting] = useState(false);
   const [slippage, setSlippage] = useState(4);
