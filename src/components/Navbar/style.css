@@ -121,12 +121,7 @@
         background-color: #3D7AB3;
     }
 
-/* Styles for Hamburger Menu */
-.hamburger {
-    display: none;
-}
-
-@media (max-width: 768px) {
+    /* Styles for Hamburger Menu */
     .hamburger {
         display: block;
         cursor: pointer;
