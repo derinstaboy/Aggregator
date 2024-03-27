@@ -60,11 +60,26 @@
 
 /* Dropdown Menu for Mobile */
 .dropdown-menu {
-  display: none;
+  display: none; /* Initially hidden */
   position: absolute;
-  background-color: #fff;
+  background-color: #fff; /* Background color */
   width: 100%;
-  /* Other styles as needed */
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Optional shadow */
+  z-index: 10;
+  left: 0; /* Align to the left of the parent element */
+  top: 100%; /* Position directly below the nav bar */
+}
+
+.dropdown-menu a {
+  display: block; /* Make each link fill the horizontal space */
+  color: black; /* Text color */
+  padding: 12px 16px; /* Padding for each link */
+  text-decoration: none; /* Remove underline */
+  border-bottom: 1px solid #ddd; /* Optional border between links */
+}
+
+.dropdown-menu a:hover {
+  background-color: #f2f2f2; /* Background color on hover */
 }
 
 /* Mobile Styles */
