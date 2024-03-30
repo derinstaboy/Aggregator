@@ -92,6 +92,19 @@ export const tokenMap2 = [
   ["0x66e428c3f67a68878562e79A0234c1F83c208770", "USDT", "usdt.webp"],
 ];
 
+// Function to sort the tokenMap by token name alphabetically
+export const sortTokenMap = () => {
+  return tokenMap.sort((a, b) => {
+    if(a[1] < b[1]) { return -1; }
+    if(a[1] > b[1]) { return 1; }
+    return 0;
+  });
+}
+
+// Sorted tokenMap
+const sortedTokenMap = sortTokenMap();
+console.log(sortedTokenMap);
+
 // export const defaultTokenSet = new Set(["0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23",
 // "0x2D03bECE6747ADC00E1a131BBA1469C15fD11e03",
 // "0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23",
