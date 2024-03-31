@@ -95,7 +95,10 @@ export const tokenMap2 = [
 
 // Function to sort the tokenMap by token name alphabetically, with CROKING always on top
 export const sortTokenMap = () => {
-  return tokenMap.sort((a, b) => {
+  // Create a copy of the tokenMap
+  const tokenMapCopy = [...tokenMap];
+
+  return tokenMapCopy.sort((a, b) => {
     // Check if either token is CROKING
     if (a[1] === "CROKING") return -1;
     if (b[1] === "CROKING") return 1;
@@ -110,6 +113,7 @@ export const sortTokenMap = () => {
 // Sorted tokenMap
 const sortedTokenMap = sortTokenMap();
 console.log(sortedTokenMap);
+
 
 // export const defaultTokenSet = new Set(["0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23",
 // "0x2D03bECE6747ADC00E1a131BBA1469C15fD11e03",
