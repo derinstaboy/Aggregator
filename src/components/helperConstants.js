@@ -85,6 +85,7 @@ export const tokenMap = [
   ["0x37FB280b118A217e85f58Cbbf096ab249aB41459", "CROjak", "crojak.webp"],
   ["0xed70e1b02a63fAfD5ECE7c0a2A1B12d4b424B4A8", "CROAK", "croak.webp"],
   ["0x679f6863a653251C8C215e77205A7058b5bF676a", "TROLL", "trollcoin.webp"]
+  
 ];
 export const tokenMap2 = [
   ["0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23", "CRO", "cronos.webp"],
