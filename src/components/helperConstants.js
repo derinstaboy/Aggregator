@@ -95,26 +95,18 @@ export const tokenMap2 = [
 
 // Function to sort the tokenMap by token name alphabetically, with CROKING always on top
 export const sortTokenMap = () => {
-  // First, find the CROKING entry
-  const croKingEntry = tokenMap.find(entry => entry[1] === "CROKING");
+  return tokenMap.sort((a, b) => {
+    // Check if either token is CROKING
+    if (a[1] === "CROKING") return -1;
+    if (b[1] === "CROKING") return 1;
 
-  // Filter out the CROKING entry
-  const otherEntries = tokenMap.filter(entry => entry[1] !== "CROKING");
-
-  // Sort the other entries alphabetically
-  otherEntries.sort((a, b) => {
-    return a[1].localeCompare(b[1]);
+    // Alphabetical sorting for the rest
+    if (a[1] < b[1]) return -1;
+    if (a[1] > b[1]) return 1;
+    return 0;
   });
-
-  // Prepend the CROKING entry if it exists
-  if (croKingEntry) {
-    otherEntries.unshift(croKingEntry);
-  }
-
-  // Log the sorted array
-  console.log("Sorted tokenMap:", otherEntries);
-  return otherEntries;
 }
 
 // Sorted tokenMap
 const sortedTokenMap = sortTokenMap();
+console.log(sortedTokenMap);
