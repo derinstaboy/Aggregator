@@ -98,7 +98,10 @@ export const sortTokenMap = () => {
   // Create a copy of the tokenMap
   const tokenMapCopy = [...tokenMap];
 
-  return tokenMapCopy.sort((a, b) => {
+  // Debugging: Log the original tokenMapCopy
+  console.log("Original tokenMapCopy:", tokenMapCopy);
+
+  const sorted = tokenMapCopy.sort((a, b) => {
     // Check if either token is CROKING
     if (a[1] === "CROKING") return -1;
     if (b[1] === "CROKING") return 1;
@@ -108,11 +111,18 @@ export const sortTokenMap = () => {
     if (a[1] > b[1]) return 1;
     return 0;
   });
+
+  // Debugging: Log the sorted array
+  console.log("Sorted tokenMapCopy:", sorted);
+
+  return sorted;
 }
 
-// Sorted tokenMap
+// Using the sorted tokenMap
 const sortedTokenMap = sortTokenMap();
-console.log(sortedTokenMap);
+console.log("Final sortedTokenMap:", sortedTokenMap);
+
+
 
 
 // export const defaultTokenSet = new Set(["0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23",
