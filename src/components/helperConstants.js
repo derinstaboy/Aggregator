@@ -83,6 +83,7 @@ export const tokenMap = [
   ["0xe44Fd7fCb2b1581822D0c862B68222998a0c299a", "ETH", "eth.webp"],
   ["0x3b41b27e74dd366ce27cb389dc7877d4e1516d4d", "MERY", "mery.webp"],
   ["0x37FB280b118A217e85f58Cbbf096ab249aB41459", "CROjak", "crojak.webp"],
+  ["0xcCcCcCcCdbEC186DC426F8B5628AF94737dF0E60", "CAW", "caw.webp"],
   ["0xed70e1b02a63fAfD5ECE7c0a2A1B12d4b424B4A8", "CROAK", "croak.webp"],
   ["0x679f6863a653251C8C215e77205A7058b5bF676a", "TROLL", "trollcoin.webp"]
 ];
