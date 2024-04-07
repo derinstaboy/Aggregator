@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import VVS from "../Abi/VVS.json";
 import CroDex from "../Abi/CroDex.json";
+import Ebisus from "../Abi/Ebisus.json";
 import MMF from "../Abi/MMF.json";
 import Aggregator from "../Abi/Aggregator.json";
 import Token from "../Abi/Token.json";
@@ -35,6 +36,9 @@ export function vssContract(signer) {
 }
 export function croDexContract(signer) {
   return new ethers.Contract(value.croDexAddress, CroDex, signer);
+}
+export function ebisusContract(signer) {
+  return new ethers.Contract(value.ebisusAddress, Ebisus, signer);
 }
 export function aggregatorContract(signer) {
   return new ethers.Contract(value.aggregatorAddress, Aggregator, signer);
