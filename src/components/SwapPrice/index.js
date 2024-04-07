@@ -5,7 +5,7 @@ import CroDex from "../../Abi/CroDex.json";
 import MMF from "../../Abi/MMF.json";
 import VVS from "../../Abi/VVS.json";
 import value from "../../value.json";
-import Ebisus from "../Abi/Ebisus.json";
+import Ebisus from "../../Abi/Ebisus.json";
 import Aggregator from "../../Abi/Aggregator.json";
 import { findMax } from "../helperFunctions";
 import {
