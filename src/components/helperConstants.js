@@ -82,7 +82,7 @@ export const tokenMap = [
   ["0xc21223249CA28397B4B6541dfFaEcC539BfF0c59", "USDC", "usdc.webp"],
   ["0x66e428c3f67a68878562e79A0234c1F83c208770", "USDT", "usdt.webp"],
   ["0x97749c9B61F878a880DfE312d2594AE07AEd7656", "MMF", "mmf.webp"],
-  ["0xF2001B145b43032AAF5Ee2884e456CCd805F677D", "DAI", "dai.webp"],
+  ["0xEfE15a7232b9F0aA890FF97Aaf53afe87D00F8BE", "BTCRONOS", "btcronos.webp"],
   ["0x0224010BA2d567ffa014222eD960D1fa43B8C8E1", "MINT", "minted.webp"],
   ["0xe44Fd7fCb2b1581822D0c862B68222998a0c299a", "ETH", "eth.webp"],
   ["0x3b41b27e74dd366ce27cb389dc7877d4e1516d4d", "MERY", "mery.webp"],
