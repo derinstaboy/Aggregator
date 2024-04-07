@@ -5,11 +5,13 @@ import CroDex from "../../Abi/CroDex.json";
 import MMF from "../../Abi/MMF.json";
 import VVS from "../../Abi/VVS.json";
 import value from "../../value.json";
+import Ebisus from "../Abi/Ebisus.json";
 import Aggregator from "../../Abi/Aggregator.json";
 import { findMax } from "../helperFunctions";
 import {
   defaultTokens,
   mmfContract,
+  ebisusContract,
   vssContract,
   croDexContract,
   aggregatorContract,
@@ -77,6 +79,7 @@ export default function SwapPrice(props) {
       const mmfRouter = mmfContract(_provider);
       const vssRouter = vssContract(_provider);
       const croDexRouter = croDexContract(_provider);
+      const ebisusRouter = ebisusContract(_provider);
       const token1Contract = tokenContract(_provider, tokens.token1);
       const deci1 = await token1Contract.decimals();
       const inputBigNumber = BigNumber.from(1).mul(
@@ -88,6 +91,7 @@ export default function SwapPrice(props) {
         mmfRouter,
         croDexRouter,
         vssRouter,
+        ebisusRouter,
       ];
       const multiAction = allPaths.map((path) =>
         getAllAmountsFromDex(path, inputBigNumber, dexContracts)
