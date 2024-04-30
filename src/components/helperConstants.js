@@ -92,6 +92,7 @@ export const tokenMap = [
   ["0xA6C3c213bF5AebC81394669294482c88694eCDCe", "COSTCRO", "costcro.webp"],
   ["0xd677944Df705924AF369d2FCcf4A989f343DbCDf", "FFTB", "fftb.webp"],
   ["0xC4137C68f8F6A7F50837725239DE17011B9b6ed9", "MOONEY", "moon.webp"],
+  ["0xB26C3A4fBaf42104EeDad8274aE74b88F27c06dE", "ORC", "orc.webp"],
   ["0x679f6863a653251C8C215e77205A7058b5bF676a", "TROLL", "trollcoin.webp"]
 ];
 export const tokenMap2 = [
