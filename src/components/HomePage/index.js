@@ -1,5 +1,21 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { Component, useState, useRef, useEffect } from "react";
 import "@rainbow-me/rainbowkit/styles.css";
+import refreshLogo from "../assests/images/refresh.svg";
+import setting from "../assests/images/setting.svg";
+import backBtn from "../assests/images/back-button.svg";
+import value from "../../value.json";
+import lionImage from "../assests/images/lion.svg";
+import InfoLogo from "../assests/images/info.svg";
+import arrowWStroke from "../assests/images/arrowwstroke.svg";
+import swapIcon from "../assests/images/swapIcon.svg";
+import walletIcon from "../assests/images/walletIcon.svg";
+import daiIcon from "../assests/images/daiIcon.svg";
+import ethIcon from "../assests/images/ethIcon.svg";
+import { ReactComponent as LegacyIcon } from "../assests/images/legacyIcon.svg";
+import walkingman from "../assests/images/walkingman.svg";
+import searchIcon from "../assests/images/searchIcon.svg";
+import pin from "../assests/images/pin.svg";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import {
   tokenMap,
   tokenContract,
@@ -11,34 +27,14 @@ import {
   checkAllowance,
   checkAllowanceForWithdrawal,
 } from "../helperFunctions";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import highlightedpin from "../assests/images/highlightedPin.svg";
+import "./style.css";
+import { Lottie1, Lottie1Dark } from "../Lottie";
 import { useSigner } from "wagmi";
 import { BigNumber, ethers } from "ethers";
 import { Notyf } from "notyf";
 import "notyf/notyf.min.css";
-import "./style.css";
-
-// Image Imports
-import refreshLogo from "../assets/images/refresh.svg";
-import setting from "../assets/images/setting.svg";
-import backBtn from "../assets/images/back-button.svg";
-import lionImage from "../assets/images/lion.svg";
-import InfoLogo from "../assets/images/info.svg";
-import arrowWStroke from "../assets/images/arrowwstroke.svg";
-import swapIcon from "../assets/images/swapIcon.svg";
-import searchIcon from "../assets/images/searchIcon.svg";
-import ethIcon from "../assets/images/ethIcon.svg";
-import highlightedpin from "../assets/images/highlightedPin.svg";
-import { ReactComponent as LegacyIcon } from "../assets/images/legacyIcon.svg";
-import { Lottie1, Lottie1Dark } from "../Lottie";
-
-const notyf = new Notyf({
-  duration: 3000,
-  position: { x: "right", y: "top" },
-  dismissible: true,
-});
-
-const HomePage = (props) => {
+export default function HomePage(props) {
   const {
     setUserInput,
     userInput,
@@ -54,13 +50,18 @@ const HomePage = (props) => {
     tokenBalance,
     isDataLoading,
   } = props;
-
-  const { data: signer } = useSigner();
-
+  const notyf = new Notyf({
+    duration: 3000,
+    position: { x: "right", y: "top" },
+    dismissible: true,
+  });
   const [slippage1, setSlippage1] = useState(1);
   const [deadline, setDeadline] = useState(20);
   const [expanded, setExpanded] = useState(false);
+  const { data: signer, isError, isLoading } = useSigner();
   const [selectToken, setSelectToken] = useState(false);
+  const [searchBarValue_list, setSearchBarValue_list] = useState(<div></div>);
+  const [searchBarValue_list2, setSearchBarValue_list2] = useState(<div></div>);
   const [selectToken1, setSelectToken1] = useState(false);
   const [selectToken2, setSelectToken2] = useState(false);
   const [searchValue1, setSearchValue1] = useState("");
@@ -69,40 +70,28 @@ const HomePage = (props) => {
   const [selectedToken2, setSelectedToken2] = useState("CRK");
   const [isSetting, setIsSetting] = useState(false);
   const [slippage, setSlippage] = useState(4);
+  const [searchBarValue, setSearchBarValue] = useState(<div></div>);
+  const [searchBarValue2, setSearchBarValue2] = useState(<div></div>);
   const [selectedIcon1, setSelectedIcon1] = useState(
-    <img src={require(`../assets/images/webP/cronos.webp`)} alt="icon" />
+    <img src={require(`../assests/images/webP/cronos.webp`)} />
   );
   const [selectedIcon2, setSelectedIcon2] = useState(
-    <img src={require(`../assets/images/webP/croking.webp`)} alt="icon" />
+    <img src={require(`../assests/images/webP/croking.webp`)} />
   );
+  // Refresh btn
   const [isRotating, setIsRotating] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const [fastTxn, setFastTxn] = useState(false);
   const [isOutputCro, setIsOutputCro] = useState(false);
-  const [searchBarValue1, setSearchBarValue1] = useState(<div></div>);
-  const [searchBarValue2, setSearchBarValue2] = useState(<div></div>);
-  const [searchBarValueList1, setSearchBarValueList1] = useState(<div></div>);
-  const [searchBarValueList2, setSearchBarValueList2] = useState(<div></div>);
-
   const handleRefreshClick = () => {
     setIsRotating(true);
-    setReload((state) => !state);
-    setTimeout(() => setIsRotating(false), 500);
+    setReload((state) => {
+      return !state;
+    });
+    setTimeout(() => setIsRotating(false), 500); // rotate for 5 milliseconds
   };
-
-  const getUserWallet = async () => {
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const address = await provider.getSigner().getAddress();
-      return [address, provider.getSigner()];
-    } catch (e) {
-      console.error(e);
-      return ["", ""];
-    }
-  };
-
-  const handleSwap = async () => {
+  const [isDisabled, setIsDisabled] = useState(false);
+  async function onClickSwap() {
     setIsDisabled(true);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     if (parseFloat(userInput) === 0) {
@@ -111,19 +100,32 @@ const HomePage = (props) => {
       return;
     }
     const feeData = await provider.getFeeData();
-    const finalGasPrice = fastTxn ? feeData.maxPriorityFeePerGas : feeData.lastBaseFeePerGas;
-
-    if ((isCro && selectedToken2 === "WCRO") || (isOutputCro && selectedToken1 === "WCRO")) {
-      const [address, signer] = await getUserWallet();
-      if (!address || !signer) {
+    let finalGasPrice = 0;
+    if (fastTxn) {
+      finalGasPrice = feeData.maxPriorityFeePerGas;
+    } else {
+      finalGasPrice = feeData.lastBaseFeePerGas;
+    }
+    console.log(isCro, selectedToken2, selectedToken1, isOutputCro);
+    if (
+      (isCro && selectedToken2 === "WCRO") ||
+      (isOutputCro && selectedToken1 === "WCRO")
+    ) {
+      const temp = await getUserWallet();
+      const address = temp[0];
+      const signer = temp[1];
+      if (address === "" || signer === "") {
         notyf.error("Please Reconnect Your Wallet and Try Again");
         setIsDisabled(false);
         return;
       }
       try {
         const croRouter = WCroContract(signer, tokenMap[0][0]);
-        const decimals = await croRouter.decimals();
-        const bigUserInput = ethers.utils.parseUnits(userInput.toString(), decimals);
+        const deci = await croRouter.decimals();
+        const bigUserInput = ethers.utils.parseUnits(
+          userInput.toString(),
+          deci
+        );
         if (isCro && selectedToken2 === "WCRO") {
           const croBalance = await provider.getBalance(address);
           if (croBalance.lt(bigUserInput)) {
@@ -131,10 +133,17 @@ const HomePage = (props) => {
             setIsDisabled(false);
             return;
           }
-          const response = await croRouter.deposit({ value: bigUserInput });
+          const response = await croRouter.deposit({
+            value: bigUserInput,
+          });
           await response.wait();
         } else if (isOutputCro && selectedToken1 === "WCRO") {
-          await checkAllowanceForWithdrawal(tokens.token1, address, signer, bigUserInput);
+          await checkAllowanceForWithdrawal(
+            tokens.token1,
+            address,
+            signer,
+            bigUserInput
+          );
           const wcroBalance = await croRouter.balanceOf(address);
           if (wcroBalance.lt(bigUserInput)) {
             notyf.error("Insufficient Balance");
@@ -144,19 +153,24 @@ const HomePage = (props) => {
           const response = await croRouter.withdraw(bigUserInput);
           await response.wait();
         }
+        setIsDisabled(false);
         notyf.success("Transaction Successful");
-        setReload((state) => !state);
+        setReload((state) => {
+          return !state;
+        });
+        return;
       } catch (e) {
         notyf.error("Something Went Wrong");
-        console.error(e);
+        console.log(e);
+        setIsDisabled(false);
+        return;
       }
-      setIsDisabled(false);
-      return;
     }
-
     if (parameters.length === 4) {
-      const [address, signer] = await getUserWallet();
-      if (!address || !signer) {
+      const temp = await getUserWallet();
+      const address = temp[0];
+      const signer = temp[1];
+      if (address === "" || signer === "") {
         notyf.error("Please Reconnect Your Wallet and Try Again");
         setIsDisabled(false);
         return;
@@ -168,150 +182,220 @@ const HomePage = (props) => {
       const tokenRouter = tokenContract(provider, tokens.token1);
       const outPutTokenRouter = tokenContract(provider, tokens.token2);
       const decimals = await tokenRouter.decimals();
-      const bigUserInput = ethers.utils.parseUnits(userInput.toString(), decimals);
+      const bigUserInput = ethers.utils.parseUnits(
+        userInput.toString(),
+        decimals
+      );
       if (!isCro) {
         await checkAllowance(tokens.token1, address, signer, bigUserInput);
       }
-      if (BigNumber.from(bigUserInput).lt(balance)) {
+      if (ethers.BigNumber.from(bigUserInput).lt(balance)) {
         const outDecimals = await outPutTokenRouter.decimals();
-        const bigOut = ethers.utils.parseUnits(outPutTokens.toFixed(outDecimals).toString(), outDecimals);
-        const temp = parseInt((100 - parseFloat(slippage1.toFixed(1))) * 10);
-        const amountOutMin = BigNumber.from(bigOut).mul(temp).div(1000);
+        const bigOut = ethers.utils.parseUnits(
+          outPutTokens.toFixed(outDecimals).toString(),
+          outDecimals
+        );
+        const temp = parseInt(
+          (100 - parseFloat(parseFloat(slippage1).toFixed(1))) * 10
+        );
+        const amountOutmin = ethers.BigNumber.from(bigOut).mul(temp).div(1000);
+        // console.log(ethers.utils.formatUnits(amountOutmin, outDecimals));
         const aggregatorRouter = aggregatorContract(signer);
-        const deadlineFromNow = Math.floor(Date.now() / 1000) + deadline * 60;
-
-        try {
-          let response;
-          if (isCro) {
-            response = await aggregatorRouter.swapExactETHForTokensSupportingFeeOnTransferTokens(
-              amountOutMin,
-              finalPath,
-              pairs,
-              address,
-              deadlineFromNow,
-              { value: bigUserInput, gasPrice: finalGasPrice }
-            );
-          } else if (isOutputCro) {
-            response = await aggregatorRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(
-              bigUserInput,
-              amountOutMin,
-              finalPath,
-              pairs,
-              address,
-              deadlineFromNow,
-              { gasPrice: finalGasPrice }
-            );
-          } else {
-            response = await aggregatorRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-              bigUserInput,
-              amountOutMin,
-              finalPath,
-              pairs,
-              address,
-              deadlineFromNow,
-              { gasPrice: finalGasPrice }
-            );
+        const deadLineFromNow = Math.floor(Date.now() / 1000) + deadline * 60;
+        if (isCro && isOutputCro) {
+          notyf.error("Both Cro can't transact");
+          setIsDisabled(false);
+          return;
+        }
+        if (isCro) {
+          try {
+            const response =
+              await aggregatorRouter.swapExactETHForTokensSupportingFeeOnTransferTokens(
+                amountOutmin,
+                finalPath,
+                pairs,
+                address,
+                deadLineFromNow,
+                { value: bigUserInput, gasPrice: finalGasPrice }
+              );
+            if (response) {
+              await response.wait();
+              notyf.success("Transaction Success");
+            }
+          } catch (e) {
+            notyf.error("Transaction Failed");
           }
-          await response.wait();
-          notyf.success("Transaction Success");
-        } catch (e) {
-          notyf.error("Transaction Failed");
-          console.error("Can't complete transaction", e);
+        } else if (isOutputCro) {
+          try {
+            const response =
+              await aggregatorRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(
+                bigUserInput,
+                amountOutmin,
+                finalPath,
+                pairs,
+                address,
+                deadLineFromNow,
+                { gasPrice: finalGasPrice }
+              );
+            await response.wait();
+            notyf.success("Transaction Success");
+          } catch (e) {
+            notyf.error("Transaction Failed");
+          }
+        } else {
+          try {
+            const response =
+              await aggregatorRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(
+                bigUserInput,
+                amountOutmin,
+                finalPath,
+                pairs,
+                address,
+                deadLineFromNow,
+                { gasPrice: finalGasPrice }
+              );
+            await response.wait();
+            notyf.success("Transaction Success");
+          } catch (e) {
+            console.log("can't complete transaction", e);
+            notyf.error("Transaction Failed");
+          }
         }
       } else {
         notyf.error("Transaction Failed");
+        setIsDisabled(false);
+        return;
       }
     } else {
       notyf.error("Reload the page and try again");
     }
     setIsDisabled(false);
     handleRefreshClick();
-  };
-
-  const onClickToken = (element, num) => {
+  }
+  function onClickToken(element, num) {
+    console.log(tokens);
     if (num === 1) {
       setSelectedToken1(element[1]);
-      setSelectedIcon1(<img src={require(`../assets/images/webP/${element[2]}`)} alt="icon" />);
-      setTokens((state) => ({
-        token1: element[0],
-        token2: state.token2,
-      }));
-      setIsCro(element[1] === "CRO");
+      setSelectedIcon1(
+        <img src={require(`../assests/images/webP/${element[2]}`)} />
+      );
+      setTokens((state) => {
+        return {
+          token1: element[0],
+          token2: state.token2,
+        };
+      });
+      if (element[1] === "CRO") {
+        setIsCro(true);
+      } else {
+        setIsCro(false);
+      }
     } else {
       setSelectedToken2(element[1]);
-      setSelectedIcon2(<img src={require(`../assets/images/webP/${element[2]}`)} alt="icon" />);
-      setTokens((state) => ({
-        token1: state.token1,
-        token2: element[0],
-      }));
-      setIsOutputCro(element[1] === "CRO");
+      setSelectedIcon2(
+        <img src={require(`../assests/images/webP/${element[2]}`)} />
+      );
+      console.log("fire fire", element[0]);
+      console.log("UPDATING");
+      setTokens((state) => {
+        return {
+          token1: state.token1,
+          token2: element[0],
+        };
+      });
+      if (element[1] === "CRO") {
+        setIsOutputCro(true);
+      } else {
+        setIsOutputCro(false);
+      }
     }
+
     setSelectToken1(false);
     setSelectToken2(false);
     setUserInput(0);
-  };
-
-  const onClickReverse = () => {
-    setIsCro(!isCro);
-    setIsOutputCro(!isOutputCro);
-    setSelectedToken1(selectedToken2);
-    setSelectedToken2(selectedToken1);
-    setSelectedIcon1(selectedIcon2);
-    setSelectedIcon2(selectedIcon1);
-    setTokens((state) => ({
-      token1: state.token2,
-      token2: state.token1,
-    }));
-    setUserInput(0);
-  };
-
-  const calculateAmountAfterSlippage = () => {
-    const slippageFraction = parseFloat(slippage1) / 100;
-    return (outPutTokens * (1 - slippageFraction)).toFixed(1);
-  };
-
-  const onChangeInput = (event) => {
-    setDeadline(event.target.value);
-  };
-
+  }
   useEffect(() => {
-    const searchToken = async (searchValue, setSearchBarValue, setSearchBarValueList, selectTokenNumber) => {
-      if (searchValue.startsWith("0x") || searchValue.startsWith("0X")) {
-        if (searchValue.length === tokenMap[0][0].length) {
-          const tokenRouter = tokenContract(_provider, searchValue);
+    console.log("I changed my value", tokens);
+  }, [tokens]);
+  function onClickReverse() {
+    if (isCro && !isOutputCro) {
+      setIsCro(false);
+      setIsOutputCro(true);
+    } else if (!isCro && isOutputCro) {
+      setIsCro(true);
+      setIsOutputCro(false);
+    }
+    const temp = selectedToken1;
+    setSelectedToken1(selectedToken2);
+    setSelectedToken2(temp);
+    setTokens((state) => {
+      return {
+        token1: state.token2,
+        token2: state.token1,
+      };
+    });
+    const temp2 = selectedIcon1;
+    setSelectedIcon1(selectedIcon2);
+    setSelectedIcon2(temp2);
+    setUserInput(0);
+  }
+
+function calculateAmountAfterSlippage() {
+  const slippageFraction = parseFloat(slippage1) / 100;
+  const amountAfterSlippage = outPutTokens * (1 - slippageFraction);
+  return amountAfterSlippage.toFixed(1); // Adjust decimal points as needed
+}
+
+
+  function onChangeInput(event) {
+    setDeadline(event.target.value);
+  }
+
+  const getUserWallet = async () => {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const address = await provider.getSigner().getAddress();
+      return [address, provider.getSigner()];
+    } catch (e) {
+      console.log(e);
+      return ["", ""];
+    }
+  };
+  const _provider = new ethers.providers.JsonRpcProvider(value.rpcUrl);
+  useEffect(() => {
+    async function searchBar1() {
+      if (searchValue1.startsWith("0x") || searchValue1.startsWith("0X")) {
+        if (searchValue1.length === tokenMap[0][0].length) {
+          const tokenRouter = tokenContract(_provider, searchValue1);
           try {
             const name = await tokenRouter.symbol();
             setTokens((state) => {
-              if (selectTokenNumber === 1) {
-                return { token1: searchValue, token2: state.token2 };
-              } else {
-                return { token1: state.token1, token2: searchValue };
-              }
+              return {
+                token1: searchValue1,
+                token2: state.token2,
+              };
             });
             for (let i = 0; i < tokenMap.length; i++) {
-              if (searchValue === tokenMap[i][0]) {
-                if (selectTokenNumber === 1) {
-                  setSelectedIcon1(<img src={require(`../assets/images/webP/${tokenMap[i][2]}`)} alt="icon" />);
-                } else {
-                  setSelectedIcon2(<img src={require(`../assets/images/webP/${tokenMap[i][2]}`)} alt="icon" />);
-                }
+              if (searchValue1 === tokenMap[i][0]) {
+                setSelectedIcon1(
+                  <img
+                    src={require(`../assests/images/webP/${tokenMap[i][2]}`)}
+                  />
+                );
                 break;
               }
               if (i === tokenMap.length - 1) {
-                if (selectTokenNumber === 1) {
-                  setSelectedIcon1(<img src={require(`../assets/images/webP/question-mark.webp`)} alt="icon" />);
-                } else {
-                  setSelectedIcon2(<img src={require(`../assets/images/webP/question-mark.webp`)} alt="icon" />);
-                }
+                setSelectedIcon1(
+                  <img
+                    src={require(`../assests/images/webP/question-mark.webp`)}
+                  />
+                );
               }
             }
-            if (selectTokenNumber === 1) {
-              setSelectedToken1(name);
-            } else {
-              setSelectedToken2(name);
-            }
+            setSelectedToken1(name);
             setSelectToken1(false);
-            setIsCro(selectTokenNumber === 1 ? false : isCro);
+            setIsCro(false);
             setSelectToken2(false);
             setUserInput(0);
           } catch (e) {
@@ -321,52 +405,165 @@ const HomePage = (props) => {
           setSearchBarValue(<div>Address Not found</div>);
         }
       } else {
-        const filteredTokens1 = tokenMap2.filter((item) =>
-          item[1].includes(searchValue.toUpperCase())
-        );
-        const tokenElements1 = filteredTokens1.map((element) => (
-          <div
-            className="fav-token cursor-pointer"
-            key={element[0] + element[1] + selectTokenNumber}
-            onClick={() => onClickToken(element, selectTokenNumber)}
-          >
-            <img
-              src={element[2] !== "" ? require(`../assets/images/webP/${element[2]}`) : ethIcon}
-              alt="eth-icon"
-            />
-            <div>{element[1]}</div>
-          </div>
-        ));
-        setSearchBarValue(tokenElements1);
+        let temp = tokenMap2
+          .filter((item) => {
+            const searchTerm = searchValue1.toUpperCase();
+            return item[1].includes(searchTerm);
+          })
+          .map((element) => {
+            return (
+              <div
+                className="fav-token cursor-pointer"
+                key={element[0] + element[1] + "1"}
+                onClick={() => onClickToken(element, 1)}
+              >
+                {element[2] !== "" ? (
+                  <img
+                    src={require(`../assests/images/webP/${element[2]}`)}
+                    alt="eth-icon"
+                  />
+                ) : (
+                  <img src={ethIcon} alt="eth-icon" />
+                )}
+                <div>{element[1]}</div>
+              </div>
+            );
+          });
+        setSearchBarValue(temp);
 
-        const filteredTokens2 = tokenMap.filter((item) =>
-          item[1].includes(searchValue.toUpperCase())
-        );
-        const tokenElements2 = filteredTokens2.map((element) => (
-          <div
-            className="fav-token list_token cursor-pointer"
-            key={element[0] + element[1] + selectTokenNumber}
-            onClick={() => onClickToken(element, selectTokenNumber)}
-          >
-            <img
-              src={element[2] !== "" ? require(`../assets/images/webP/${element[2]}`) : ethIcon}
-              alt="eth-icon"
-            />
-            <div className="list_name_symbol">
-              <div>{element[3]}</div>
-              <div>{element[1]}</div>
-            </div>
-          </div>
-        ));
-        setSearchBarValueList(tokenElements2);
+        let temp2 = tokenMap
+          .filter((item) => {
+            const searchTerm = searchValue1.toUpperCase();
+            return item[1].includes(searchTerm);
+          })
+          .map((element, index) => {
+            return (
+              <div
+                className="fav-token list_token cursor-pointer"
+                key={element[0] + element[1] + "1"}
+                onClick={() => onClickToken(element, 1)}
+              >
+                {element[2] !== "" ? (
+                  <img
+                    src={require(`../assests/images/webP/${element[2]}`)}
+                    alt="eth-icon"
+                  />
+                ) : (
+                  <img src={ethIcon} alt="eth-icon" />
+                )}
+                <div className="list_name_symbol">
+                  <div>{element[3]}</div>
+                  <div>{element[1]}</div>
+                </div>
+                <div></div>
+              </div>
+            );
+          });
+        setSearchBarValue_list(temp2);
       }
-    };
-
-    searchToken(searchValue1, setSearchBarValue1, setSearchBarValueList1, 1);
+    }
+    searchBar1();
   }, [searchValue1]);
 
   useEffect(() => {
-    searchToken(searchValue2, setSearchBarValue2, setSearchBarValueList2, 2);
+    async function searchBar2() {
+      if (searchValue2.startsWith("0x") || searchValue2.startsWith("0X")) {
+        if (searchValue2.length === tokenMap[0][0].length) {
+          const tokenRouter = tokenContract(_provider, searchValue2);
+          try {
+            const name = await tokenRouter.symbol();
+            setTokens((state) => {
+              return {
+                token1: state.token1,
+                token2: searchValue2,
+              };
+            });
+            setSelectedToken2(name);
+            setSelectToken1(false);
+            setIsOutputCro(false);
+            setSelectToken2(false);
+            setUserInput(0);
+            for (let i = 0; i < tokenMap.length; i++) {
+              if (searchValue2 === tokenMap[i][0]) {
+                setSelectedIcon2(
+                  <img
+                    src={require(`../assests/images/webP/${tokenMap[i][2]}`)}
+                  />
+                );
+                break;
+              }
+              if (i === tokenMap.length - 1) {
+                setSelectedIcon2(
+                  <img
+                    src={require(`../assests/images/webP/question-mark.webp`)}
+                  />
+                );
+              }
+            }
+          } catch (e) {
+            setSearchBarValue2(selectToken2 && <div>Address Not found</div>);
+          }
+        } else {
+          setSearchBarValue2(selectToken2 && <div>Address Not found</div>);
+        }
+      } else {
+        let temp = tokenMap2
+          .filter((item) => {
+            const searchTerm = searchValue2.toUpperCase();
+            return item[1].includes(searchTerm);
+          })
+          .map((element) => {
+            return (
+              <div
+                className="fav-token cursor-pointer"
+                key={element[0] + element[1] + "2"}
+                onClick={() => onClickToken(element, 2)}
+              >
+                {element[2] !== "" ? (
+                  <img
+                    src={require(`../assests/images/webP/${element[2]}`)}
+                    alt="eth-icon"
+                  />
+                ) : (
+                  <img src={ethIcon} alt="eth-icon" />
+                )}
+                <div>{element[1]}</div>
+              </div>
+            );
+          });
+        setSearchBarValue2(temp);
+
+        let temp2 = tokenMap
+          .filter((item) => {
+            const searchTerm = searchValue2.toUpperCase();
+            return item[1].includes(searchTerm);
+          })
+          .map((element) => {
+            return (
+              <div
+                className="fav-token list_token cursor-pointer"
+                key={element[0] + element[1] + "2"}
+                onClick={() => onClickToken(element, 2)}
+              >
+                {element[2] !== "" ? (
+                  <img
+                    src={require(`../assests/images/webP/${element[2]}`)}
+                    alt="eth-icon"
+                  />
+                ) : (
+                  <img src={ethIcon} alt="eth-icon" />
+                )}
+                <div className="list_name_symbol">
+                  <div>{element[3]}</div>
+                  <div>{element[1]}</div>
+                </div>
+              </div>
+            );
+          });
+        setSearchBarValue_list2(temp2);
+      }
+    }
+    searchBar2();
   }, [searchValue2]);
 
   return (
@@ -387,7 +584,9 @@ const HomePage = (props) => {
                     <img
                       onClick={handleRefreshClick}
                       src={refreshLogo}
-                      className={`cursor-pointer refreshIcon ${isRotating ? "rotating" : ""}`}
+                      className={`cursor-pointer refreshIcon ${
+                        isRotating ? "rotating" : ""
+                      }`}
                       alt="refresh"
                     />
                   </div>
@@ -444,10 +643,10 @@ const HomePage = (props) => {
                     )}
                   </div>
                   <div className="amountOptionWrapper">
-                    <div onClick={() => setUserInput(tokenBalance / 4)} className="amountOption">25%</div>
-                    <div onClick={() => setUserInput(tokenBalance / 2)} className="amountOption">50%</div>
-                    <div onClick={() => setUserInput(tokenBalance * 3 / 4)} className="amountOption">75%</div>
-                    <div onClick={() => setUserInput(tokenBalance / 1)} className="amountOption">100%</div>
+                    <div onClick={()=>setUserInput(tokenBalance/4)} className="amountOption">25%</div>
+                    <div onClick={()=>setUserInput(tokenBalance/2)} className="amountOption">50%</div>
+                    <div onClick={()=>setUserInput(tokenBalance*3/4)} className="amountOption">75%</div>
+                    <div onClick={()=>setUserInput(tokenBalance/1)} className="amountOption">100%</div>
                   </div>
                 </div>
                 <div className="swapIconDiv">
@@ -491,9 +690,11 @@ const HomePage = (props) => {
                   </div>
                 </div>
               </div>
-              <div className="slippage-display">
-                <span className="small-text">Current slippage: {slippage1}%</span>
-              </div>
+                          <
+
+div className="slippage-display">
+  <span className="small-text">Current slippage: {slippage1}%</span>
+</div>
               <div className="token-input">
                 <div className="swap-mode-selector">
                   <div
@@ -559,6 +760,7 @@ const HomePage = (props) => {
                     transition: "height 0.5s ease-out",
                   }}
                 >
+                   
                   <div className="modes">
                     <div
                       className="mode-option-notselected"
@@ -621,14 +823,25 @@ const HomePage = (props) => {
                         </span>
                       </div>
                     </div>
+                    {/* <div className="grid-row">
+                                    <div>
+                                        Tx Cost
+                                    </div>
+                                    <div className="value-desc">
+                                        <button className="hidebtn">Hide</button>
+                                        <img src={walkingman} className='cursor-pointer refreshIcon' alt="refresh" />
+                                        <span className="usd-token-price">($1 588.5)</span>
+                                        <span className="highlighted-token-amount">1 581.4 (DAI)</span>
+                                    </div>
+                                    </div> */}
                   </div>
-                </div>
               </div>
-              <div className="token-input-row">
-                <div className="amount-after-slippage">
-                  <span className="small-text">Minimum received: {calculateAmountAfterSlippage()}</span>
-                </div>
               </div>
+                    <div className="token-input-row">
+  <div className="amount-after-slippage">
+    <span className="small-text">Minimum received: {calculateAmountAfterSlippage()}</span>
+  </div>
+</div>
               <div className="btn-wrapper">
                 {!signer && (
                   <ConnectButton
@@ -638,10 +851,10 @@ const HomePage = (props) => {
                     accountStatus={"avatar"}
                   />
                 )}
-                {signer && (
+                {signer !== undefined && signer !== null && (
                   <button
                     className="connect-wallet-btn dex_connect"
-                    onClick={handleSwap}
+                    onClick={onClickSwap}
                     disabled={isDisabled}
                   >
                     Swap
@@ -667,44 +880,118 @@ const HomePage = (props) => {
                 </div>
                 <div className="headingtxt">Select a token</div>
               </div>
+              {/* <div className="searchBar">
+                        <img src={searchIcon} className="searchIcon" alt="search-icon"/>
+                        <input className="search-input" type="text" placeholder="Search by name or paste address" value={searchValue1} onChange=
+                        {(event)=>{
+                            setSearchValue1(event.target.value)
+                        }}/>
+                    </div>
+                    <div className="token-grid"> */}
+              {/* {selectToken1 && tokenMap.map(element => {
+                            return (<div className="fav-token cursor-pointer" key={element[0] + element[1]} onClick={() => onClickToken(element, 1)}>
+                                {element[2] !== "" ? <img src={require(`../assests/images/webP/${element[2]}`)} alt ="eth-icon" />: <img src={ethIcon} alt ="eth-icon" />}
+                                <div>{element[1]}</div>
+                            </div>)
+                        })} */}
+              {selectToken1 && (
+                <div className="searchBar">
+                  <img
+                    src={searchIcon}
+                    className="searchIcon"
+                    alt="search-icon"
+                  />
+                  <input
+                    className="search-input"
+                    type="text"
+                    placeholder="Search by name or paste address"
+                    value={searchValue1}
+                    onChange={(event) => {
+                      setSearchValue1(event.target.value);
+                    }}
+                  />
+                </div>
+              )}
               {selectToken1 && (
                 <>
-                  <div className="searchBar">
-                    <img src={searchIcon} className="searchIcon" alt="search-icon" />
-                    <input
-                      className="search-input"
-                      type="text"
-                      placeholder="Search by name or paste address"
-                      value={searchValue1}
-                      onChange={(event) => setSearchValue1(event.target.value)}
-                    />
-                  </div>
-                  <div className="token-grid">{searchBarValue1}</div>
-                  <hr />
+                  <div className="token-grid">{searchBarValue}</div>
+                  <hr></hr>
                   <div className="list">
-                    <ul className="list_tokens">{searchBarValueList1}</ul>
+                    <li className="list_tokens">{searchBarValue_list}</li>
                   </div>
                 </>
               )}
               {selectToken2 && (
+                <div className="searchBar">
+                  <img
+                    src={searchIcon}
+                    className="searchIcon"
+                    alt="search-icon"
+                  />
+                  <input
+                    className="search-input"
+                    type="text"
+                    placeholder="Search by name or paste address"
+                    value={searchValue2}
+                    onChange={(event) => {
+                      setSearchValue2(event.target.value);
+                    }}
+                  />
+                </div>
+              )}
+              {selectToken2 && (
                 <>
-                  <div className="searchBar">
-                    <img src={searchIcon} className="searchIcon" alt="search-icon" />
-                    <input
-                      className="search-input"
-                      type="text"
-                      placeholder="Search by name or paste address"
-                      value={searchValue2}
-                      onChange={(event) => setSearchValue2(event.target.value)}
-                    />
-                  </div>
                   <div className="token-grid">{searchBarValue2}</div>
-                  <hr />
+                  <hr></hr>
                   <div className="list">
-                    <ul className="list_tokens">{searchBarValueList2}</ul>
+                    <li className="list_tokens">{searchBarValue_list2}</li>
                   </div>
                 </>
               )}
+              {/* {selectToken2 && tokenMap.map(element => {
+                            return (<div className="fav-token cursor-pointer" key={element[0] + element[1]} onClick={() => onClickToken(element, 2)}>
+                                {element[2] !== "" ? <img src={require(`../assests/images/webP/${element[2]}`)} alt ="eth-icon" />: <img src={ethIcon} alt ="eth-icon" />}
+                                <div>{element[1]}</div>
+                            </div>)
+                        })} */}
+              {/* <div className="separator"></div>
+                    <div className="select-accordion">
+                        <div className="token-choice">
+                            <img src={ethIcon} alt ="eth-icon" />
+                            <div className="">
+                            <div className="token-name">
+                                 Ethereum
+                            </div>
+                            <div className="token-symbol">ETH</div>
+                            </div>
+                            <div className="pinned">
+                                <div>0</div>
+                                <img src={pin} className="pin-align" alt="pin" />
+                            </div>
+                        </div>
+                        <div className="token-choice">
+                            <img src={ethIcon} alt ="eth-icon" />
+                            <div className="">
+                            <div className="token-name">
+                                 Ethereum
+                            </div>
+                            <div className="token-symbol">ETH</div>
+                            </div>
+                            <div className="pinned">
+                                <div>0</div>
+                                <img src={highlightedpin} className="pin-align" alt="pin" />
+                            </div>
+                        </div>
+                        <div className="token-choice">
+                            <img src={ethIcon} alt ="eth-icon" />
+                            <div className="">
+                            <div className="token-name">
+                                 Ethereum
+                            </div>
+                            <div className="token-symbol">ETH</div>
+                            </div>
+                        </div>
+                    </div> */}
             </div>
           )}
           <div className="img-wrapper">
@@ -718,40 +1005,92 @@ const HomePage = (props) => {
               className="back-button no-style"
               onClick={() => setIsSetting(false)}
             >
-              <img src={backBtn} alt="back" />
+              <img src={backBtn} alt="" />
             </button>
             <div className="setting-container">
               <h1>Slippage tolerance</h1>
               <ul className="slippage">
-                {[0.1, 0.5, 1.0].map((value, index) => (
-                  <li
-                    key={index}
-                    className="slippage-item flex-center"
-                    style={{
-                      backgroundColor: slippage === index + 1 ? "rgba(223, 187, 0, 1)" : "rgba(37, 37, 45, 1)",
-                      color: slippage !== index + 1 ? "rgba(153, 153, 153, 1)" : "rgba(23, 24, 29, 1)",
+                <li
+                  className="slippage-item flex-center"
+                  style={{
+                    backgroundColor:
+                      slippage === 1
+                        ? "rgba(223, 187, 0, 1)"
+                        : "rgba(37, 37, 45, 1)",
+                    color:
+                      slippage !== 1
+                        ? "rgba(153, 153, 153, 1)"
+                        : "rgba(23, 24, 29, 1)",
+                  }}
+                >
+                  <button
+                    className="no-style"
+                    onClick={() => {
+                      setSlippage(1);
+                      setSlippage1(0.1);
                     }}
                   >
-                    <button
-                      className="no-style"
-                      onClick={() => {
-                        setSlippage(index + 1);
-                        setSlippage1(value);
-                      }}
-                    >
-                      {value}%
-                    </button>
-                  </li>
-                ))}
+                    0.1%
+                  </button>
+                </li>
+                <li
+                  className="slippage-item flex-center"
+                  style={{
+                    backgroundColor:
+                      slippage === 2
+                        ? "rgba(223, 187, 0, 1)"
+                        : "rgba(37, 37, 45, 1)",
+                    color:
+                      slippage !== 2
+                        ? "rgba(153, 153, 153, 1)"
+                        : "rgba(23, 24, 29, 1)",
+                  }}
+                >
+                  <button
+                    className="no-style"
+                    onClick={() => {
+                      setSlippage(2);
+                      setSlippage1(0.5);
+                    }}
+                  >
+                    0.5%
+                  </button>
+                </li>
+                <li
+                  className="slippage-item flex-center"
+                  style={{
+                    backgroundColor:
+                      slippage === 3
+                        ? "rgba(223, 187, 0, 1)"
+                        : "rgba(37, 37, 45, 1)",
+                    color:
+                      slippage !== 3
+                        ? "rgba(153, 153, 153, 1)"
+                        : "rgba(23, 24, 29, 1)",
+                  }}
+                >
+                  <button
+                    className="no-style"
+                    onClick={() => {
+                      setSlippage(3);
+                      setSlippage1(1.0);
+                    }}
+                  >
+                    1.0%
+                  </button>
+                </li>
                 <li className="slippage-item">
                   <input
                     className="setting-input"
                     type="text"
                     value={slippage1}
                     onChange={(event) => {
-                      const value = parseFloat(event.target.value);
-                      setSlippage1(value);
-                      setSlippage([0.1, 0.5, 1.0].includes(value) ? [0.1, 0.5, 1.0].indexOf(value) + 1 : 4);
+                      setSlippage1(event.target.value);
+                      const temp = parseFloat(event.target.value);
+                      if (temp === 0.1) setSlippage(1);
+                      else if (temp === 0.5) setSlippage(2);
+                      else if (temp === 1) setSlippage(3);
+                      else setSlippage(4);
                     }}
                   />
                 </li>
@@ -762,7 +1101,9 @@ const HomePage = (props) => {
                   className="setting-input"
                   type="text"
                   value={deadline}
-                  onChange={onChangeInput}
+                  onChange={(event) => {
+                    onChangeInput(event);
+                  }}
                 />
               </div>
             </div>
@@ -771,6 +1112,4 @@ const HomePage = (props) => {
       )}
     </>
   );
-};
-
-export default HomePage;
+}
