@@ -1,190 +1,163 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "@rainbow-me/rainbowkit/styles.css";
-import { BigNumber } from "ethers";
-import CroDex from "../../Abi/CroDex.json";
-import MMF from "../../Abi/MMF.json";
-import VVS from "../../Abi/VVS.json";
-import value from "../../value.json";
-import Ebisus from "../../Abi/Ebisus.json";
-import Aggregator from "../../Abi/Aggregator.json";
-import { findMax } from "../helperFunctions";
+import { BigNumber, ethers } from "ethers";
 import {
   defaultTokens,
   mmfContract,
   ebisusContract,
   vssContract,
   croDexContract,
-  aggregatorContract,
-  allPaths,
   tokenContract,
-  tokenMap,
   factoryContract,
+  allPaths,
 } from "../helperConstants";
 import { useSigner, useProvider } from "wagmi";
-import { ethers } from "ethers";
+import { findMax } from "../helperFunctions";
+import value from "../../value.json";
 
-export default function SwapPrice(props) {
-  const {
-    userInput,
-    setOutPutTokens,
-    setConvertToken,
-    isCro,
-    setParameters,
-    reload,
-    tokens,
-    setTokens,
-    setTokenBalance,
-    setIsDataLoading,
-  } = props;
-  const { data: signer, isError, isLoading } = useSigner();
+export default function SwapPrice({
+  userInput,
+  setOutPutTokens,
+  setConvertToken,
+  isCro,
+  setParameters,
+  reload,
+  tokens,
+  setTokens,
+  setTokenBalance,
+  setIsDataLoading,
+}) {
+  const { data: signer } = useSigner();
   const provider = useProvider();
   const [finalAmount, setFinalAmount] = useState(0);
-  const [router, setRouter] = useState();
+  const [router, setRouter] = useState(null);
   const [finalPath, setFinalPath] = useState([tokens.token1, tokens.token2]);
-  const [pairs, setPairs] = useState();
+  const [pairs, setPairs] = useState([]);
   const [balance, setBalance] = useState(0);
   const [routerFinalPath, setRouterFinalPath] = useState([]);
+
   useEffect(() => {
     if (tokens.token1 === tokens.token2) {
       setOutPutTokens(userInput);
-      return;
+    } else {
+      setOutPutTokens(userInput * finalAmount);
     }
-    setOutPutTokens(userInput * finalAmount);
-  }, [userInput, tokens]);
-  async function getAmountsOutFromDex(path, amountsIn, contract) {
+  }, [userInput, tokens, finalAmount]);
+
+  const getAmountsOutFromDex = async (path, amountsIn, contract) => {
     try {
       const val = await contract.getAmountsOut(amountsIn, path);
       return val[val.length - 1]._hex.toString();
     } catch (e) {
       return "0";
     }
-  }
-  async function getAllAmountsFromDex(path, amountsIn, dexContracts) {
-    const temp = [tokens.token1].concat(path, [tokens.token2]);
-    const action = dexContracts.map((contract) =>
+  };
+
+  const getAllAmountsFromDex = async (path, amountsIn, dexContracts) => {
+    const temp = [tokens.token1, ...path, tokens.token2];
+    const actions = dexContracts.map((contract) =>
       getAmountsOutFromDex(temp, amountsIn, contract)
     );
-    return Promise.all(action)
-      .then((results) => {
-        return results;
-      })
-      .catch((e) => console.log("hello error"));
-  }
-  async function getFinalAmount() {
+    return Promise.all(actions);
+  };
+
+  const getFinalAmount = useCallback(async () => {
     setIsDataLoading(true);
     try {
-      const _provider = provider
-        ? provider
-        : new ethers.providers.JsonRpcProvider(value.rpcUrl);
-      const mmfRouter = mmfContract(_provider);
-      const vssRouter = vssContract(_provider);
-      const croDexRouter = croDexContract(_provider);
-      const ebisusRouter = ebisusContract(_provider);
+      const _provider = provider || new ethers.providers.JsonRpcProvider(value.rpcUrl);
+      const dexContracts = [
+        mmfContract(_provider),
+        croDexContract(_provider),
+        vssContract(_provider),
+        ebisusContract(_provider),
+      ];
       const token1Contract = tokenContract(_provider, tokens.token1);
       const deci1 = await token1Contract.decimals();
-      const inputBigNumber = BigNumber.from(1).mul(
-        BigNumber.from(10).pow(deci1)
-      );
+      const inputBigNumber = BigNumber.from(1).mul(BigNumber.from(10).pow(deci1));
       const token2Contract = tokenContract(_provider, tokens.token2);
       const deci2 = await token2Contract.decimals();
-      const dexContracts = [
-        mmfRouter,
-        croDexRouter,
-        vssRouter,
-        ebisusRouter,
-      ];
+
       const multiAction = allPaths.map((path) =>
         getAllAmountsFromDex(path, inputBigNumber, dexContracts)
       );
-      Promise.all(multiAction)
-        .then((results) => {
-          const item = findMax(results);
-          const result = parseFloat(ethers.utils.formatUnits(item[0], deci2));
-          setFinalAmount(result);
-          setConvertToken(result);
-          const tempContract = dexContracts[item[2]];
-          setRouter(tempContract);
-          const tempPath = [tokens.token1].concat(allPaths[item[1]], [
-            tokens.token2,
-          ]);
-          setFinalPath(tempPath);
-          setRouterFinalPath([tempContract, tempPath]);
-        })
-        .catch((e) => console.log(e));
+      const results = await Promise.all(multiAction);
+      const item = findMax(results);
+      const result = parseFloat(ethers.utils.formatUnits(item[0], deci2));
+
+      setFinalAmount(result);
+      setConvertToken(result);
+      setRouter(dexContracts[item[2]]);
+      const tempPath = [tokens.token1, ...allPaths[item[1]], tokens.token2];
+      setFinalPath(tempPath);
+      setRouterFinalPath([dexContracts[item[2]], tempPath]);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
     setIsDataLoading(false);
-  }
-  useEffect(() => {
-    getFinalAmount();
-  }, [tokens, reload, isCro]);
+  }, [tokens, provider, setIsDataLoading, setConvertToken]);
 
   useEffect(() => {
-    const _provider = provider
-      ? provider
-      : new ethers.providers.JsonRpcProvider(value.rpcUrl);
-    async function findPairs() {
+    getFinalAmount();
+  }, [getFinalAmount, tokens, reload, isCro]);
+
+  useEffect(() => {
+    const _provider = provider || new ethers.providers.JsonRpcProvider(value.rpcUrl);
+    const findPairs = async () => {
       try {
         const factory = await routerFinalPath[0].factory();
         const factoryRouter = factoryContract(_provider, factory);
-        let temp = [];
-        for (let i = 0; i < routerFinalPath[1].length - 1; i++) {
-          const pair = await factoryRouter.getPair(
-            routerFinalPath[1][i],
-            routerFinalPath[1][i + 1]
-          );
-          temp.push(pair);
-        }
+        const temp = await Promise.all(
+          routerFinalPath[1].slice(0, -1).map((token, i) =>
+            factoryRouter.getPair(token, routerFinalPath[1][i + 1])
+          )
+        );
         setPairs(temp);
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
-    }
-    if (
-      routerFinalPath !== null &&
-      routerFinalPath !== undefined &&
-      routerFinalPath[0] !== null &&
-      routerFinalPath[0] !== undefined &&
-      routerFinalPath[1] !== null &&
-      routerFinalPath[1] !== undefined
-    ) {
+    };
+
+    if (routerFinalPath[0] && routerFinalPath[1]) {
       findPairs();
     }
-  }, [routerFinalPath]);
-  async function getBalance() {
+  }, [routerFinalPath, provider]);
+
+  const getBalance = useCallback(async () => {
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const address = await provider.getSigner().getAddress();
-      const token1Contract = tokenContract(provider, tokens.token1);
-      let balance1 = 0;
+      const _provider = new ethers.providers.Web3Provider(window.ethereum);
+      await _provider.send("eth_requestAccounts", []);
+      const address = await _provider.getSigner().getAddress();
+      const token1Contract = tokenContract(_provider, tokens.token1);
+      let balance1;
+
       if (isCro) {
-        balance1 = await provider.getBalance(address);
+        balance1 = await _provider.getBalance(address);
       } else {
         balance1 = await token1Contract.balanceOf(address);
       }
+
       setBalance(balance1);
       const decimalsHere = await token1Contract.decimals();
       const temp = ethers.utils.formatUnits(balance1._hex, decimalsHere);
       setTokenBalance(parseFloat(temp).toFixed(5));
     } catch (e) {
-      console.log(e, "Error in fetching Balance");
+      console.error("Error in fetching Balance", e);
     }
-  }
+  }, [tokens.token1, isCro, setTokenBalance]);
+
   useEffect(() => {
     if (window.ethereum) {
       getBalance();
     }
-  }, [tokens.token1, reload, isCro]);
+  }, [tokens.token1, reload, isCro, getBalance]);
 
   useEffect(() => {
     setParameters([balance, router, finalPath, pairs]);
-  }, [balance, router, finalPath, pairs]);
+  }, [balance, router, finalPath, pairs, setParameters]);
+
   return (
-    <>
-      <div>{}</div>
-      <div>{}</div>
-    </>
+    <div>
+      <div>{/* Any necessary UI components */}</div>
+    </div>
   );
 }
