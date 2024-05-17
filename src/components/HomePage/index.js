@@ -282,6 +282,7 @@ export default function HomePage(props) {
   };
 
   useEffect(() => {
+    const _provider = new ethers.providers.JsonRpcProvider(value.rpcUrl);
     const searchBar1 = async () => {
       if (searchValue1.startsWith("0x") || searchValue1.startsWith("0X")) {
         if (searchValue1.length === tokenMap[0][0].length) {
@@ -329,6 +330,7 @@ export default function HomePage(props) {
   }, [searchValue1]);
 
   useEffect(() => {
+    const _provider = new ethers.providers.JsonRpcProvider(value.rpcUrl);
     const searchBar2 = async () => {
       if (searchValue2.startsWith("0x") || searchValue2.startsWith("0X")) {
         if (searchValue2.length === tokenMap[0][0].length) {
@@ -418,6 +420,7 @@ export default function HomePage(props) {
                     setUserInput(temp === "" ? "0" : temp);
                   }}
                   isDataLoading={isDataLoading}
+                  setUserInput={setUserInput} // Pass setUserInput here
                 />
                 <div className="swapIconDiv">
                   <button className="no-style" onClick={onClickReverse}>
@@ -510,7 +513,7 @@ export default function HomePage(props) {
   );
 }
 
-const TokenInput = ({ label, tokenIcon, tokenSymbol, tokenBalance, userInput, onTokenClick, onInputChange, isDataLoading, readOnly }) => (
+const TokenInput = ({ label, tokenIcon, tokenSymbol, tokenBalance, userInput, onTokenClick, onInputChange, isDataLoading, readOnly, setUserInput }) => (
   <div className={`token-input${readOnly ? " token-input2" : ""}`}>
     <div className="token-input-row buy-sell-text">{label}</div>
     <div className="token-input-row">
