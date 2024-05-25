@@ -89,6 +89,7 @@ export const tokenMap = [
   ["0x37FB280b118A217e85f58Cbbf096ab249aB41459", "CROjak", "crojak.webp"],
   ["0xcCcCcCcCdbEC186DC426F8B5628AF94737dF0E60", "CAW", "caw.webp"],
   ["0xed70e1b02a63fAfD5ECE7c0a2A1B12d4b424B4A8", "CROAK", "croak.webp"],
+  ["0x2c95783e0cecDB17DaA687241F49e1bb8e49f78c", "CROBRA", "crobra.webp"],
   ["0xA6C3c213bF5AebC81394669294482c88694eCDCe", "COSTCRO", "costcro.webp"],
   ["0xd677944Df705924AF369d2FCcf4A989f343DbCDf", "FFTB", "fftb.webp"],
   ["0x7492450cc8897a4e444Ad972eB1619251EF15C23", "GM", "gm.webp"],
